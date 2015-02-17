@@ -1,91 +1,110 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading;
-
-//създаване на обект
-struct Object
-{
-    //тези данни показват:
-    public int x; //къде по Х координатата
-    public int y; //Къде по У координатата
-    public char c; // какво тук е символ нашето ще е масив от символи
-    public ConsoleColor color; //какъв цвят
-}
+using System.Threading.Tasks;
 
 class CarsGame
 {
-    static void Main()
+    const int RaceWidth = 70;
+    const int RaceHeight = 28;
+    const int InfoPanelHeight = 10;
+    const int GameWidth = RaceWidth;
+    const int GameHeight = RaceHeight + InfoPanelHeight;
+    static char[,] userCar = new char[,]
     {
-        double speed;
-        double acceleration;
-        int playfieldWidth;
-        int livesCount;
+            { ' ',' ',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ',' ' },
+            { ' ',' ',' ',' ',' ',' ',' ','[','_',' ','_',']',' ',' ',' ',' ','[','_',' ','_',']',' ',' ',' ','_',' ',' ' },
+            { ' ',' ','/','|',' ',' ','_','_','_','$','_','_','_','_','_','_','_','_','S','_',' ',' ',' ','|',' ','\\',' ' },
+            { ' ','/',' ','|','-','/',' ',' ',' ',' ',' ',' ',' ',' ','_','_','_','_',' ',' ','[','+','+','|',' ','|','+' },
+            { '<','<','<','<','<','-','-','-','<','|',' ',' ','|','>','_','_','_','_','O',')','<','o','o','o','>','|',' ' },
+            { ' ','\\',' ','|','-','\\','_','_','_',' ','_','_','_','_','_','_','_','_',' ','_','[','+','+','|',' ','|','+' },
+            { ' ',' ','\\','|',' ',' ',' ',' ','_','$','_',' ',' ',' ',' ',' ',' ','_','S','_',' ',' ',' ','|','_','/',' ' },
+            { ' ',' ',' ',' ',' ',' ',' ','[','_','_','_',']',' ',' ',' ',' ','[','_','_','_',']',' ',' ',' ',' ',' ',' ' }
 
+    };
+    static char[,] obstacle = new char[,]
+    {
+        { '#','#' },{ '#','#' },{ '#','#' },{ '#','#' },{ '#','#' },{ '#','#' },{ '#','#' },{ '#','#' }
+    };
+    static int currUserCarRow = 0;
+    static int currUserCarCol = 43;
+    static int obstRow = 0;
+    static int obstCol = 0;
 
-        Console.BufferHeight = Console.WindowHeight = 35;
-        Console.BufferWidth = Console.WindowWidth = 170;
+    static Random random = new Random();
 
-        while (true)
+    static void PrintFigure(char[,] figure, int row, int col, ConsoleColor color)
+    {
+        Console.ForegroundColor = color;
+        for (int x = 0; x < figure.GetLength(0); x++)
         {
-            MoveUserCar();
-            NewCar();
-            HittingCars();
-            Console.Clear();
-            if (HittingCars())
+            for (int y = 0; y < figure.GetLength(1); y++)
             {
-                //трябва да се изчистят всичките колички дето падат
+                Print(row + x, col + y, figure[x, y]);
             }
-            else
-            {
-                //PrintOnPosition();
-            }
-            //foreach (Object car in objects)
-            //{
-            //    //PrintOnPosition();
-            //}
-            DrawInfo();
         }
     }
 
-    //Този метод го ползваме за принтиране на количките и текста
-    static void PrintOnPosition(int x, int y, char c, ConsoleColor color = ConsoleColor.Gray)
-    {
 
+
+    static void Print(int row, int col, object data)
+    {
+        Console.SetCursorPosition(col, row);
+        Console.Write(data);
     }
 
-    //след като свършат животите ползваме този метод.
-    static void PrintStringOnPosition(int x, int y, string str, ConsoleColor color = ConsoleColor.Gray)
+    static void Main()
     {
+        Console.Title = "Car Race F1";
+        Console.WindowWidth = GameWidth;
+        Console.BufferWidth = GameWidth;
+        Console.WindowHeight = GameHeight + 1;
+        Console.BufferHeight = GameHeight + 1;
 
-    }
-
-    // това е колата на user-a
-    static void MoveUserCar()
-    {
-
-    }
-
-    //този е за създаване на нова кола която пада
-    static void NewCar()
-    {
-
-    }
-
-    //проверява дали количките са се ударили
-    static bool HittingCars()
-    {
-
-        return true;// трябва да се създаде някаква промелнива която да връща bool дали са се ударили или не.
-    }
-
-    static void OldCar()
-    {
-
-    }
-
-    //този е за принтиране на инфото за животите, ускорението и т.н.
-    static void DrawInfo()
-    {
+        while (true)
+        {
+            if (Console.KeyAvailable)
+            {
+                var key = Console.ReadKey();
+                if (key.Key == ConsoleKey.UpArrow)
+                {
+                    if (currUserCarRow > 1)
+                    {
+                        currUserCarRow = currUserCarRow - 8;
+                    }
+                }
+                else if (key.Key == ConsoleKey.DownArrow)
+                {
+                    if (currUserCarRow + 8 - 1 < RaceHeight - 8)
+                    {
+                        currUserCarRow = currUserCarRow + 8;
+                    }
+                }
+            }
+            if (obstCol < RaceWidth - 2)
+            {
+                obstCol = obstCol + 2;
+            }
+            else
+            {
+                obstCol = 0;
+                if (obstRow < 16)
+                {
+                    obstRow = obstRow + 8;
+                }
+                else
+                {
+                    obstRow = obstRow - 8;
+                }
+            }
+            PrintFigure(userCar, currUserCarRow, currUserCarCol, ConsoleColor.Cyan);
+            PrintFigure(obstacle, obstRow, obstCol, ConsoleColor.Red);
+            Thread.Sleep(50);
+            Console.Clear();
+        }
 
     }
 }
+
