@@ -77,14 +77,11 @@ class CarsGame
             //}
             foreach (Object car in objects)
             {
-                PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red);
-
-                
+                PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red); 
             }
             DrawInfo();
-
+            Thread.Sleep(50);
             Console.Clear();
-            Thread.Sleep(100);
         }
     }
 
@@ -104,6 +101,8 @@ class CarsGame
     //Метод, който принтира
     static void Print(int row, int col, object data)
     {
+
+        Console.CursorVisible = false;
         Console.SetCursorPosition(col, row);
         Console.Write(data);
     }
