@@ -9,7 +9,7 @@ struct Object
     //тези данни показват:
     public int x; //къде по Х координатата
     public int y; //Къде по У координатата
-    public char c; // какво тук е символ нашето ще е масив от символи
+    public char[,] c; // какво тук е символ нашето ще е масив от символи
     public ConsoleColor color; //какъв цвят
 }
 
@@ -41,7 +41,7 @@ class CarsGame
     static int newCarRow = 0;
     static int newCarCol = 0;
     static int count = 0;
-
+    static List<Object> objects = new List<Object>();
     static Random random = new Random();
 
     static void Main()
@@ -60,8 +60,8 @@ class CarsGame
         while (true)
         {
             MoveUserCar();
-            NewCar(newCarRow, newCarCol);
-            newCarCol = newCarCol + 2;
+            NewCar();
+            OldCar();
             HittingCars();
             if (HittingCars())
             {
@@ -75,7 +75,16 @@ class CarsGame
             //{
             //    //PrintOnPosition();
             //}
+            foreach (Object car in objects)
+            {
+                PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red);
+
+                
+            }
             DrawInfo();
+
+            Console.Clear();
+            Thread.Sleep(100);
         }
     }
 
@@ -143,22 +152,24 @@ class CarsGame
     }
 
     //този е за създаване на нова кола която пада
-    static void NewCar(int row, int col)
+    static void NewCar()
     {
-        if (col > RaceWidth - 2)
+        int chance = random.Next(0, 100);
+        int carsOnLine = 1;
+        if (chance > 2)
         {
-            col = 0;
-            newCarCol = 0;
-            if (row < 16)
-            {
-                row += 8;
-                newCarRow += 8;
-            }
-
-
+            carsOnLine = 0;
         }
+        for (int i = 1; i <= carsOnLine; i++)
+        {
+            Object newCar = new Object();
+            newCar.color = ConsoleColor.Yellow;
+            newCar.x = 0;
+            newCar.y = 0;
+            newCar.c = enemyCar;
 
-        PrintOnPosition(enemyCar, row, col, ConsoleColor.Red);
+            objects.Add(newCar);
+        }
     }
 
     //проверява дали количките са се ударили
@@ -170,13 +181,28 @@ class CarsGame
 
     static void OldCar()
     {
+        List<Object> newList = new List<Object>();
+        for (int i = 0; i < objects.Count; i++)
+        {
+            Object oldCar = objects[i];
+            Object newObject = new Object();
+            newObject.x = oldCar.x + 1;
+            newObject.y = oldCar.y;
+            newObject.c = oldCar.c;
+            newObject.color = oldCar.color;
+            if (newObject.x < GameWidth-1)
+            {
+                newList.Add(newObject);
+            }
+
+        }
+        objects = newList;
 
     }
 
     //този е за принтиране на инфото за животите, ускорението и т.н.
     static void DrawInfo()
     {
-        Thread.Sleep(50);
-        Console.Clear();
+
     }
 }
