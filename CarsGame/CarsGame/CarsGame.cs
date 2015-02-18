@@ -80,7 +80,7 @@ class CarsGame
                 PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red); 
             }
             DrawInfo();
-            Thread.Sleep(50);
+            Thread.Sleep(70);
             Console.Clear();
         }
     }
@@ -155,6 +155,8 @@ class CarsGame
     {
         int chance = random.Next(0, 100);
         int carsOnLine = 1;
+        int[] laneY = { 0, 8, 16 };
+        int randomIndexLaneY = random.Next(0, laneY.Length);
         if (chance > 2)
         {
             carsOnLine = 0;
@@ -164,7 +166,7 @@ class CarsGame
             Object newCar = new Object();
             newCar.color = ConsoleColor.Yellow;
             newCar.x = 0;
-            newCar.y = 0;
+            newCar.y = laneY[randomIndexLaneY];
             newCar.c = enemyCar;
 
             objects.Add(newCar);
