@@ -41,7 +41,7 @@ class CarsGame
     static Object newObject = new Object();
 
     static Random random = new Random();
-        
+
 
     static void Main()
     {
@@ -67,7 +67,7 @@ class CarsGame
             {
                 //трябва да се изчистят всичките колички дето падат
             }
-                
+
             else
             {
                 //PrintOnPosition();
@@ -76,12 +76,12 @@ class CarsGame
             //{
             //    //PrintOnPosition();
             //}
-            
+
             foreach (Object car in objects)
             {
-                PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red); 
+                PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red);
             }
-            DrawInfo();
+            DrawInfo(GameWidth,GameHeight,livesCount,acceleration,speed);
             Thread.Sleep(70);
             Console.Clear();
         }
@@ -112,6 +112,10 @@ class CarsGame
     //след като свършат животите ползваме този метод.
     static void PrintStringOnPosition(int x, int y, string str, ConsoleColor color = ConsoleColor.Gray)
     {
+        Console.SetCursorPosition(x, y);
+        Console.ForegroundColor = color;
+
+        Console.Write(str);
 
     }
 
@@ -131,7 +135,7 @@ class CarsGame
                 MoveUserCarDown();
             }
         }
-        
+
         PrintOnPosition(userCar.c, userCar.y, userCar.x, ConsoleColor.Cyan);
     }
 
@@ -176,9 +180,9 @@ class CarsGame
         }
 
         OldCar();
-        
-            
-        
+
+
+
     }
 
     //проверява дали количките са се ударили
@@ -202,7 +206,7 @@ class CarsGame
             newObject.c = oldCar.c;
             newObject.color = oldCar.color;
             HittingCars();
-            if (newObject.x < GameWidth-1)
+            if (newObject.x < GameWidth - 1)
             {
                 newList.Add(newObject);
             }
@@ -213,8 +217,33 @@ class CarsGame
     }
 
     //този е за принтиране на инфото за животите, ускорението и т.н.
-    static void DrawInfo()
+    static void DrawInfo(int gameWidth, int gameHeight, double LiveCounter, double Acceleration,double Speed)
     {
+        //liveCounter - брой на животи, != 0;
+        int x = 0, y = 0;
+        string str = string.Empty;
+        ConsoleColor color = ConsoleColor.Gray;
 
+        x = gameWidth / 2;
+        y = gameHeight - 6;
+
+        Console.ForegroundColor = color;
+
+        if (true)
+        {
+            Console.SetCursorPosition(x, y);
+            Console.Write("Lives remaining: " + LiveCounter);
+            Console.WriteLine();
+            Console.Write("Current Speed: "+ Speed);
+            Console.WriteLine();
+            Console.Write("Current Acceleration: " + Acceleration);
+            Console.WriteLine();
+        }
+        else
+        {
+            PrintStringOnPosition(x, y, "GAME OVER!");
+        }
+
+       
     }
 }
