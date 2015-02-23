@@ -34,9 +34,6 @@ class CarsGame
     };
     static char[,] enemyCar = new char[,]
     {
-<<<<<<< HEAD
-        { '#','#' },{ '#','#' },{ '#','#' },{ '#','#' },{ '#','#' },{ '#','#' },{ '#','#' },{ '#','#' }
-=======
             { ' ',' ',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ',' ' },
             { ' ',' ',' ','_',' ',' ',' ','[','_',' ','_',']',' ',' ',' ',' ','[','_',' ','_',']',' ',' ',' ',' ',' ',' ' },
             { ' ',' ','/',' ','|',' ',' ','_','_','$','_','_','_','_','_','_','_','_','S','_','_',' ',' ','|','\\',' ',' ' },
@@ -45,7 +42,6 @@ class CarsGame
             { ' ','+','|',' ','+','+',']','_','_',' ','_','_','_','_','_','_','_','_',' ','_','_','/','-','|',' ','/',' ' },
             { ' ',' ','\\','_','|',' ',' ',' ','_','$','_',' ',' ',' ',' ',' ',' ','_','S','_',' ',' ',' ','|','/',' ',' ' },
             { ' ',' ',' ',' ',' ',' ',' ','[','_','_','_',']',' ',' ',' ',' ','[','_','_','_',']',' ',' ',' ',' ',' ',' ' }
->>>>>>> origin/Nikolay
     };
     static List<Object> objects = new List<Object>();
     static Object userCar = new Object();
@@ -74,25 +70,19 @@ class CarsGame
         {
             MoveUserCar();
             NewCar();
-            speed = HittingCars();
-
+            if (HittingCars())
+            {
+                --livesCount;
+            }
             foreach (Object car in objects)
             {
                 PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red);
             }
-<<<<<<< HEAD
-            ++speed;
-=======
->>>>>>> origin/Nikolay
             if (speed >= 90)
             {
                 speed = 90;
             }
-<<<<<<< HEAD
             DrawInfo(GameWidth, GameHeight, livesCount, acceleration, speed);
-=======
-            DrawInfo();
->>>>>>> origin/Nikolay
             Thread.Sleep(100 - speed);
             Console.Clear();
             Console.SetCursorPosition(GameWidth - 2, GameHeight - 2);
@@ -189,18 +179,15 @@ class CarsGame
     }
 
     //проверява дали количките са се ударили
-    static int HittingCars()
+    static bool HittingCars()
     {
-<<<<<<< HEAD
-        if ((newObject.y == userCar.y) && (newObject.x >= userCar.x))
-=======
-        if ((newObject.y == userCar.y) && (newObject.x +25 >= userCar.x))
->>>>>>> origin/Nikolay
+        if ((newObject.y == userCar.y) && (newObject.x + 25 >= userCar.x))
         {
             speed += acceleration;
             objects.Clear();
+            return true;
         }
-        return speed;
+        return false;
     }
 
     static void OldCar()
@@ -214,7 +201,7 @@ class CarsGame
             newObject.c = oldCar.c;
             HittingCars();
             newObject.color = oldCar.color;
-            if (newObject.x < GameWidth - 1)
+            if (newObject.x < GameWidth - 26)
             {
                 newList.Add(newObject);
             }
@@ -245,11 +232,14 @@ class CarsGame
             Console.WriteLine();
             Console.Write("Current Acceleration: " + Acceleration);
             Console.WriteLine();
+            
         }
         else
         {
+            Console.Clear();
             PrintStringOnPosition(x, y, "GAME OVER!");
+            Environment.Exit(0);
+            
         }
-
     }
 }
