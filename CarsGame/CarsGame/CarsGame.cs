@@ -20,7 +20,7 @@ class CarsGame
     const int InfoPanelHeight = 10;
     const int GameWidth = RaceWidth;
     const int GameHeight = RaceHeight + InfoPanelHeight;
-    static char[,] userCar = new char[,]
+    static char[,] userCarArr = new char[,]
     {
             { ' ',' ',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ',' ' },
             { ' ',' ',' ',' ',' ',' ',' ','[','_',' ','_',']',' ',' ',' ',' ','[','_',' ','_',']',' ',' ',' ','_',' ',' ' },
@@ -36,13 +36,12 @@ class CarsGame
     {
         { '#','#' },{ '#','#' },{ '#','#' },{ '#','#' },{ '#','#' },{ '#','#' },{ '#','#' },{ '#','#' }
     };
-    static int currUserCarRow = 0;
-    static int currUserCarCol = 43;
-    static int newCarRow = 0;
-    static int newCarCol = 0;
-    static int count = 0;
     static List<Object> objects = new List<Object>();
+    static Object userCar = new Object();
+    static Object newObject = new Object();
+
     static Random random = new Random();
+        
 
     static void Main()
     {
@@ -57,16 +56,18 @@ class CarsGame
         Console.WindowHeight = GameHeight + 1;
         Console.BufferHeight = GameHeight + 1;
 
+        newObject.x = 40;
+        userCar.c = userCarArr;
+
         while (true)
         {
             MoveUserCar();
             NewCar();
-            OldCar();
-            HittingCars();
             if (HittingCars())
             {
                 //трябва да се изчистят всичките колички дето падат
             }
+                
             else
             {
                 //PrintOnPosition();
@@ -75,6 +76,7 @@ class CarsGame
             //{
             //    //PrintOnPosition();
             //}
+            
             foreach (Object car in objects)
             {
                 PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red); 
@@ -116,6 +118,7 @@ class CarsGame
     // това е колата на user-a
     static void MoveUserCar()
     {
+        userCar.x = 43;
         if (Console.KeyAvailable)
         {
             var key = Console.ReadKey();
@@ -128,25 +131,25 @@ class CarsGame
                 MoveUserCarDown();
             }
         }
-
-        PrintOnPosition(userCar, currUserCarRow, currUserCarCol, ConsoleColor.Cyan);
+        
+        PrintOnPosition(userCar.c, userCar.y, userCar.x, ConsoleColor.Cyan);
     }
 
     // премества колата на user-a надолу
     static void MoveUserCarDown()
     {
-        if (currUserCarRow + 8 - 1 < RaceHeight - 8)
+        if (userCar.y + 8 - 1 < RaceHeight - 8)
         {
-            currUserCarRow = currUserCarRow + 8;
+            userCar.y = userCar.y + 8;
         }
     }
 
     // премества колата на user-a нагоре
     static void MoveUserCarUp()
     {
-        if (currUserCarRow > 1)
+        if (userCar.y > 1)
         {
-            currUserCarRow = currUserCarRow - 8;
+            userCar.y = userCar.y - 8;
         }
     }
 
@@ -157,26 +160,34 @@ class CarsGame
         int carsOnLine = 1;
         int[] laneY = { 0, 8, 16 };
         int randomIndexLaneY = random.Next(0, laneY.Length);
-        if (chance > 2)
-        {
-            carsOnLine = 0;
-        }
-        for (int i = 1; i <= carsOnLine; i++)
+        if (chance < 90)
         {
             Object newCar = new Object();
             newCar.color = ConsoleColor.Yellow;
             newCar.x = 0;
             newCar.y = laneY[randomIndexLaneY];
             newCar.c = enemyCar;
+            if ((newObject.x - newCar.x) >= 40)
+            {
 
-            objects.Add(newCar);
+
+                objects.Add(newCar);
+            }
         }
+
+        OldCar();
+        
+            
+        
     }
 
     //проверява дали количките са се ударили
     static bool HittingCars()
     {
-
+        if ((newObject.y == userCar.y) && (newObject.x >= userCar.x))
+        {
+            Console.WriteLine("Hit");
+        }
         return true;// трябва да се създаде някаква промелнива която да връща bool дали са се ударили или не.
     }
 
@@ -186,11 +197,11 @@ class CarsGame
         for (int i = 0; i < objects.Count; i++)
         {
             Object oldCar = objects[i];
-            Object newObject = new Object();
             newObject.x = oldCar.x + 1;
             newObject.y = oldCar.y;
             newObject.c = oldCar.c;
             newObject.color = oldCar.color;
+            HittingCars();
             if (newObject.x < GameWidth-1)
             {
                 newList.Add(newObject);
