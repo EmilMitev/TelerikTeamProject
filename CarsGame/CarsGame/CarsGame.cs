@@ -81,7 +81,7 @@ class CarsGame
             {
                 PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red);
             }
-            DrawInfo(GameWidth,GameHeight,livesCount,acceleration,speed);
+           // DrawInfo(GameWidth,GameHeight,livesCount,acceleration,speed);
             Thread.Sleep(70);
             Console.Clear();
         }
