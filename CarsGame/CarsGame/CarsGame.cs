@@ -74,7 +74,7 @@ class CarsGame
             {
                 speed = 90;
             }
-            DrawInfo();
+            DrawInfo(GameWidth, GameHeight, livesCount, acceleration, speed);
             Thread.Sleep(100 - speed);
             Console.Clear();
             Console.SetCursorPosition(GameWidth - 2, GameHeight - 2);
@@ -202,8 +202,32 @@ class CarsGame
     }
 
     //този е за принтиране на инфото за животите, ускорението и т.н.
-    static void DrawInfo()
+    static void DrawInfo(int gameWidth, int gameHeight, double LiveCounter, double Acceleration, double Speed)
     {
+        //liveCounter - брой на животи, != 0;
+        int x = 0, y = 0;
+        string str = string.Empty;
+        ConsoleColor color = ConsoleColor.Gray;
+
+        x = gameWidth / 2;
+        y = gameHeight - 6;
+
+        Console.ForegroundColor = color;
+
+        if (LiveCounter > 0)
+        {
+            Console.SetCursorPosition(x, y);
+            Console.Write("Lives remaining: " + LiveCounter);
+            Console.WriteLine();
+            Console.Write("Current Speed: " + Speed);
+            Console.WriteLine();
+            Console.Write("Current Acceleration: " + Acceleration);
+            Console.WriteLine();
+        }
+        else
+        {
+            PrintStringOnPosition(x, y, "GAME OVER!");
+        }
 
     }
 }
