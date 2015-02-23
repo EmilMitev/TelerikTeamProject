@@ -74,6 +74,51 @@ class CarsGame
             {
                 --livesCount;
             }
+
+            #region end of the program
+            if (!DrawInfo(GameWidth, GameHeight, livesCount, acceleration, speed))
+            {
+                Console.Clear();
+                Console.WriteLine(@"    .... NO! ...                  ... MNO! ...
+   ..... MNO!! ...................... MNNOO! ...
+ ..... MMNO! ......................... MNNOO!! .
+..... MNOONNOO!   MMMMMMMMMMPPPOII!   MNNO!!!! .
+ ... !O! NNO! MMMMMMMMMMMMMPPPOOOII!! NO! ....
+    ...... ! MMMMMMMMMMMMMPPPPOOOOIII! ! ...
+   ........ MMMMMMMMMMMMPPPPPOOOOOOII!! .....
+   ........ MMMMMOOOOOOPPPPPPPPOOOOMII! ...
+    ....... MMMMM..    OPPMMP    .,OMI! ....
+     ...... MMMM::   o.,OPMP,.o   ::I!! ...
+         .... NNM:::.,,OOPM!P,.::::!! ....
+          .. MMNNNNNOOOOPMO!!IIPPO!!O! .....
+         ... MMMMMNNNNOO:!!:!!IPPPPOO! ....
+           .. MMMMMNNOOMMNNIIIPPPOO!! ......
+          ...... MMMONNMMNNNIIIOO!..........
+       ....... MN MOMMMNNNIIIIIO! OO ..........
+    ......... MNO! IiiiiiiiiiiiI OOOO ...........
+  ...... NNN.MNO! . O!!!!!!!!!O . OONO NO! ........
+   .... MNNNNNO! ...OOOOOOOOOOO .  MMNNON!........
+   ...... MNNNNO! .. PPPPPPPPP .. MMNON!........
+      ...... OO! ................. ON! .......
+         ................................
+");
+                Console.WriteLine(@" $$$$$$\   $$$$$$\  $$\      $$\ $$$$$$$$\        $$$$$$\  $$\    $$\ $$$$$$$$\ $$$$$$$\  
+$$  __$$\ $$  __$$\ $$$\    $$$ |$$  _____|      $$  __$$\ $$ |   $$ |$$  _____|$$  __$$\ 
+$$ /  \__|$$ /  $$ |$$$$\  $$$$ |$$ |            $$ /  $$ |$$ |   $$ |$$ |      $$ |  $$ |
+$$ |$$$$\ $$$$$$$$ |$$\$$\$$ $$ |$$$$$\          $$ |  $$ |\$$\  $$  |$$$$$\    $$$$$$$  |
+$$ |\_$$ |$$  __$$ |$$ \$$$  $$ |$$  __|         $$ |  $$ | \$$\$$  / $$  __|   $$  __$$< 
+$$ |  $$ |$$ |  $$ |$$ |\$  /$$ |$$ |            $$ |  $$ |  \$$$  /  $$ |      $$ |  $$ |
+\$$$$$$  |$$ |  $$ |$$ | \_/ $$ |$$$$$$$$\        $$$$$$  |   \$  /   $$$$$$$$\ $$ |  $$ |
+ \______/ \__|  \__|\__|     \__|\________|       \______/     \_/    \________|\__|  \__|
+                                                                                          
+                                                                                          
+                                                                                          ");
+                                                                                          
+                       
+                return;
+            }
+            #endregion
+
             foreach (Object car in objects)
             {
                 PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red);
@@ -211,7 +256,7 @@ class CarsGame
     }
 
     //този е за принтиране на инфото за животите, ускорението и т.н.
-    static void DrawInfo(int gameWidth, int gameHeight, double LiveCounter, double Acceleration, double Speed)
+    static bool DrawInfo(int gameWidth, int gameHeight, double LiveCounter, double Acceleration, double Speed)
     {
         //liveCounter - брой на животи, != 0;
         int x = 0, y = 0;
@@ -232,14 +277,11 @@ class CarsGame
             Console.WriteLine();
             Console.Write("Current Acceleration: " + Acceleration);
             Console.WriteLine();
-            
         }
         else
         {
-            Console.Clear();
-            PrintStringOnPosition(x, y, "GAME OVER!");
-            Environment.Exit(0);
-            
+            return false;
         }
+        return true;
     }
 }
