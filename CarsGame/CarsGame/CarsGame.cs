@@ -1,7 +1,13 @@
+<<<<<<< HEAD
 ﻿﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+=======
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+>>>>>>> origin/Nikolay
 
 //създаване на обект
 struct Object
@@ -9,12 +15,17 @@ struct Object
     //тези данни показват:
     public int x; //къде по Х координатата
     public int y; //Къде по У координатата
+<<<<<<< HEAD
     public char[,] c; // какво тук е символ нашето ще е масив от символи
+=======
+    public char c; // какво тук е символ нашето ще е масив от символи
+>>>>>>> origin/Nikolay
     public ConsoleColor color; //какъв цвят
 }
 
 class CarsGame
 {
+<<<<<<< HEAD
     const int RaceWidth = 70;
     const int RaceHeight = 28;
     const int InfoPanelHeight = 10;
@@ -58,10 +69,39 @@ class CarsGame
 
         newObject.x = 40;
         userCar.c = userCarArr;
+=======
+    static int newCarRow = 0;
+    static int newCarCol = 0;
+    static Random rand = new Random();
+
+    static char[,] enemyCar = new char[,]
+    {
+            { ' ',' ',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ',' ' },
+            { ' ',' ',' ','_',' ',' ',' ','[','_',' ','_',']',' ',' ',' ',' ','[','_',' ','_',']',' ',' ',' ',' ',' ',' ' },
+            { ' ',' ','/',' ','|',' ',' ','_','_','$','_','_','_','_','_','_','_','_','S','_','_',' ',' ','|','\\',' ',' ' },
+            { ' ','+','|',' ','+','+',']',' ',' ','_','_','_','_',' ',' ',' ',' ',' ',' ',' ',' ','\\','-','|',' ','\\',' ' },
+            { ' ','|','<','o','o','o','>','(','0','_','_','_','_','<','|',' ','|','>','-','-','-','>','>','>','>','>',' ' },
+            { ' ','+','|',' ','+','+',']','_','_',' ','_','_','_','_','_','_','_','_',' ','_','_','/','-','|',' ','/',' ' },
+            { ' ',' ','\\','_','|',' ',' ',' ','_','$','_',' ',' ',' ',' ',' ',' ','_','S','_',' ',' ',' ','|','/',' ',' ' },
+            { ' ',' ',' ',' ',' ',' ',' ','[','_','_','_',']',' ',' ',' ',' ','[','_','_','_',']',' ',' ',' ',' ',' ',' ' }
+    };
+
+    static void Main()
+    {
+        double speed;
+        double acceleration;
+        int playfieldWidth;
+        int livesCount;
+
+
+        Console.BufferHeight = Console.WindowHeight = 35;
+        Console.BufferWidth = Console.WindowWidth = 170;
+>>>>>>> origin/Nikolay
 
         while (true)
         {
             MoveUserCar();
+<<<<<<< HEAD
             NewCar();
             speed = HittingCars();
 
@@ -102,6 +142,32 @@ class CarsGame
         Console.CursorVisible = false;
         Console.SetCursorPosition(col, row);
         Console.Write(data);
+=======
+            NewCar(newCarRow, newCarCol);
+            HittingCars();
+            if (HittingCars())
+            {
+                //трябва да се изчистят всичките колички дето падат
+            }
+            else
+            {
+                //PrintOnPosition();
+            }
+            //foreach (Object car in objects)
+            //{
+            //    //PrintOnPosition();
+            //}
+            DrawInfo();
+            Console.Clear();
+
+        }
+    }
+
+    //Този метод го ползваме за принтиране на количките и текста
+    static void PrintOnPosition(int x, int y, char c, ConsoleColor color = ConsoleColor.Gray)
+    {
+
+>>>>>>> origin/Nikolay
     }
 
     //след като свършат животите ползваме този метод.
@@ -113,6 +179,7 @@ class CarsGame
     // това е колата на user-a
     static void MoveUserCar()
     {
+<<<<<<< HEAD
         userCar.x = 43;
         if (Console.KeyAvailable)
         {
@@ -179,10 +246,47 @@ class CarsGame
             objects.Clear();
         }
         return speed;
+=======
+
+    }
+
+    //този е за създаване на нова кола която пада
+    static void NewCar(int row, int col)
+    {
+        for (int x = 0; x < enemyCar.GetLength(1); x++)
+        {
+            for (int y = 0; y < enemyCar.GetLength(0); y++)
+            {
+                Console.SetCursorPosition(x + col, y + row);
+                Console.Write(enemyCar[y, x]);
+            }
+        }
+        newCarCol = newCarCol + 2;
+        if (newCarCol >= 142)
+        {
+            newCarCol = 0;
+
+            switch (rand.Next(3))
+            {
+                case 1: newCarRow = 0; break;
+                case 2: newCarRow = 8; break;
+                case 3: newCarRow = 16; break;
+            }
+        }
+
+    }
+
+    //проверява дали количките са се ударили
+    static bool HittingCars()
+    {
+
+        return true;// трябва да се създаде някаква промелнива която да връща bool дали са се ударили или не.
+>>>>>>> origin/Nikolay
     }
 
     static void OldCar()
     {
+<<<<<<< HEAD
         List<Object> newList = new List<Object>();
         for (int i = 0; i < objects.Count; i++)
         {
@@ -199,11 +303,18 @@ class CarsGame
 
         }
         objects = newList;
+=======
+
+>>>>>>> origin/Nikolay
     }
 
     //този е за принтиране на инфото за животите, ускорението и т.н.
     static void DrawInfo()
     {
+<<<<<<< HEAD
 
+=======
+        Thread.Sleep(50);
+>>>>>>> origin/Nikolay
     }
 }
