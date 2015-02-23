@@ -15,7 +15,7 @@ struct Object
 
 class CarsGame
 {
-    const int RaceWidth = 70;
+    const int RaceWidth = 150;
     const int RaceHeight = 28;
     const int InfoPanelHeight = 10;
     const int GameWidth = RaceWidth;
@@ -34,7 +34,18 @@ class CarsGame
     };
     static char[,] enemyCar = new char[,]
     {
+<<<<<<< HEAD
         { '#','#' },{ '#','#' },{ '#','#' },{ '#','#' },{ '#','#' },{ '#','#' },{ '#','#' },{ '#','#' }
+=======
+            { ' ',' ',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ',' ' },
+            { ' ',' ',' ','_',' ',' ',' ','[','_',' ','_',']',' ',' ',' ',' ','[','_',' ','_',']',' ',' ',' ',' ',' ',' ' },
+            { ' ',' ','/',' ','|',' ',' ','_','_','$','_','_','_','_','_','_','_','_','S','_','_',' ',' ','|','\\',' ',' ' },
+            { ' ','+','|',' ','+','+',']',' ',' ','_','_','_','_',' ',' ',' ',' ',' ',' ',' ',' ','\\','-','|',' ','\\',' ' },
+            { ' ','|','<','o','o','o','>','(','0','_','_','_','_','<','|',' ','|','>','-','-','-','>','>','>','>','>',' ' },
+            { ' ','+','|',' ','+','+',']','_','_',' ','_','_','_','_','_','_','_','_',' ','_','_','/','-','|',' ','/',' ' },
+            { ' ',' ','\\','_','|',' ',' ',' ','_','$','_',' ',' ',' ',' ',' ',' ','_','S','_',' ',' ',' ','|','/',' ',' ' },
+            { ' ',' ',' ',' ',' ',' ',' ','[','_','_','_',']',' ',' ',' ',' ','[','_','_','_',']',' ',' ',' ',' ',' ',' ' }
+>>>>>>> origin/Nikolay
     };
     static List<Object> objects = new List<Object>();
     static Object userCar = new Object();
@@ -69,12 +80,19 @@ class CarsGame
             {
                 PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red);
             }
+<<<<<<< HEAD
             ++speed;
+=======
+>>>>>>> origin/Nikolay
             if (speed >= 90)
             {
                 speed = 90;
             }
+<<<<<<< HEAD
             DrawInfo(GameWidth, GameHeight, livesCount, acceleration, speed);
+=======
+            DrawInfo();
+>>>>>>> origin/Nikolay
             Thread.Sleep(100 - speed);
             Console.Clear();
             Console.SetCursorPosition(GameWidth - 2, GameHeight - 2);
@@ -113,7 +131,7 @@ class CarsGame
     // това е колата на user-a
     static void MoveUserCar()
     {
-        userCar.x = 43;
+        userCar.x = 120;
         if (Console.KeyAvailable)
         {
             var key = Console.ReadKey();
@@ -173,7 +191,11 @@ class CarsGame
     //проверява дали количките са се ударили
     static int HittingCars()
     {
+<<<<<<< HEAD
         if ((newObject.y == userCar.y) && (newObject.x >= userCar.x))
+=======
+        if ((newObject.y == userCar.y) && (newObject.x +25 >= userCar.x))
+>>>>>>> origin/Nikolay
         {
             speed += acceleration;
             objects.Clear();
@@ -187,7 +209,7 @@ class CarsGame
         for (int i = 0; i < objects.Count; i++)
         {
             Object oldCar = objects[i];
-            newObject.x = oldCar.x + 1;
+            newObject.x = oldCar.x + 10;
             newObject.y = oldCar.y;
             newObject.c = oldCar.c;
             HittingCars();
