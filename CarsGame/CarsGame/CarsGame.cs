@@ -41,14 +41,14 @@ class CarsGame
     static Object newObject = new Object();
 
     static Random random = new Random();
-        
+
+    static int speed = 0;
+    static int acceleration = 2;
+    static int livesCount = 3;
+
 
     static void Main()
     {
-        double speed;
-        double acceleration;
-        int playfieldWidth;
-        int livesCount;
 
         Console.Title = "Car Race F1";
         Console.WindowWidth = GameWidth;
@@ -63,27 +63,22 @@ class CarsGame
         {
             MoveUserCar();
             NewCar();
-            if (HittingCars())
-            {
-                //трябва да се изчистят всичките колички дето падат
-            }
-                
-            else
-            {
-                //PrintOnPosition();
-            }
-            //foreach (Object car in objects)
-            //{
-            //    //PrintOnPosition();
-            //}
-            
+            speed = HittingCars();
+
             foreach (Object car in objects)
             {
-                PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red); 
+                PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red);
+            }
+            ++speed;
+            if (speed >= 90)
+            {
+                speed = 90;
             }
             DrawInfo();
-            Thread.Sleep(70);
+            Thread.Sleep(100 - speed);
             Console.Clear();
+            Console.SetCursorPosition(GameWidth - 2, GameHeight - 2);
+            Console.WriteLine(speed);
         }
     }
 
@@ -131,7 +126,7 @@ class CarsGame
                 MoveUserCarDown();
             }
         }
-        
+
         PrintOnPosition(userCar.c, userCar.y, userCar.x, ConsoleColor.Cyan);
     }
 
@@ -169,26 +164,21 @@ class CarsGame
             newCar.c = enemyCar;
             if ((newObject.x - newCar.x) >= 40)
             {
-
-
                 objects.Add(newCar);
             }
         }
-
         OldCar();
-        
-            
-        
     }
 
     //проверява дали количките са се ударили
-    static bool HittingCars()
+    static int HittingCars()
     {
         if ((newObject.y == userCar.y) && (newObject.x >= userCar.x))
         {
-            Console.WriteLine("Hit");
+            speed += acceleration;
+            objects.Clear();
         }
-        return true;// трябва да се създаде някаква промелнива която да връща bool дали са се ударили или не.
+        return speed;
     }
 
     static void OldCar()
@@ -200,16 +190,15 @@ class CarsGame
             newObject.x = oldCar.x + 1;
             newObject.y = oldCar.y;
             newObject.c = oldCar.c;
-            newObject.color = oldCar.color;
             HittingCars();
-            if (newObject.x < GameWidth-1)
+            newObject.color = oldCar.color;
+            if (newObject.x < GameWidth - 1)
             {
                 newList.Add(newObject);
             }
 
         }
         objects = newList;
-
     }
 
     //този е за принтиране на инфото за животите, ускорението и т.н.
