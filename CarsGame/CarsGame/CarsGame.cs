@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,7 +34,7 @@ class CarsGame
     };
     static char[,] enemyCar = new char[,]
     {
-                        { ' ',' ',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ',' ' },
+            { ' ',' ',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ',' ' },
             { ' ',' ',' ','_',' ',' ',' ','[','_',' ','_',']',' ',' ',' ',' ','[','_',' ','_',']',' ',' ',' ',' ',' ',' ' },
             { ' ',' ','/',' ','|',' ',' ','_','_','$','_','_','_','_','_','_','_','_','S','_','_',' ',' ','|','\\',' ',' ' },
             { ' ','+','|',' ','+','+',']',' ',' ','_','_','_','_',' ',' ',' ',' ',' ',' ',' ',' ','\\','-','|',' ','\\',' ' },
@@ -49,13 +49,13 @@ class CarsGame
 
     static Random random = new Random();
 
+    static int speed = 0;
+    static int acceleration = 2;
+    static int livesCount = 3;
+
 
     static void Main()
     {
-        int speed = 0;
-        int acceleration = 1;
-        int playfieldWidth;
-        int livesCount;
 
         Console.Title = "Car Race F1";
         Console.WindowWidth = GameWidth;
@@ -70,28 +70,22 @@ class CarsGame
         {
             MoveUserCar();
             NewCar();
-            if (HittingCars())
-            {
-                speed += acceleration;
-            }
-
-            else
-            {
-            }
-            //foreach (Object car in objects)
-            //{
-            //    //PrintOnPosition();
-            //}
+            speed = HittingCars();
 
             foreach (Object car in objects)
             {
                 PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red);
             }
-
+            ++speed;
+            if (speed >= 90)
+            {
+                speed = 90;
+            }
             DrawInfo();
             Thread.Sleep(100 - speed);
             Console.Clear();
-
+            Console.SetCursorPosition(GameWidth - 2, GameHeight - 2);
+            Console.WriteLine(speed);
         }
     }
 
@@ -180,26 +174,18 @@ class CarsGame
                 objects.Add(newCar);
             }
         }
-
         OldCar();
-
-
-
     }
 
     //проверява дали количките са се ударили
-    static bool HittingCars()
+    static int HittingCars()
     {
-        if ((newObject.y == userCar.y) && (newObject.x >= userCar.x))
+        if ((newObject.y == userCar.y) && (newObject.x +25 >= userCar.x))
         {
-            Console.WriteLine("Hit");
-            return true;
+            speed += acceleration;
+            objects.Clear();
         }
-        else
-        {
-            return false;
-        }
-        // трябва да се създаде някаква промелнива която да връща bool дали са се ударили или не.
+        return speed;
     }
 
     static void OldCar()
@@ -211,6 +197,7 @@ class CarsGame
             newObject.x = oldCar.x + 1;
             newObject.y = oldCar.y;
             newObject.c = oldCar.c;
+            HittingCars();
             newObject.color = oldCar.color;
             if (newObject.x < GameWidth - 26)
             {
@@ -219,7 +206,6 @@ class CarsGame
 
         }
         objects = newList;
-
     }
 
     //този е за принтиране на инфото за животите, ускорението и т.н.
