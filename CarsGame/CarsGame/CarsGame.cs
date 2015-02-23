@@ -15,7 +15,7 @@ struct Object
 
 class CarsGame
 {
-    const int RaceWidth = 70;
+    const int RaceWidth = 150;
     const int RaceHeight = 28;
     const int InfoPanelHeight = 10;
     const int GameWidth = RaceWidth;
@@ -76,7 +76,6 @@ class CarsGame
             {
                 PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red);
             }
-            ++speed;
             if (speed >= 90)
             {
                 speed = 90;
@@ -120,7 +119,7 @@ class CarsGame
     // това е колата на user-a
     static void MoveUserCar()
     {
-        userCar.x = 43;
+        userCar.x = 120;
         if (Console.KeyAvailable)
         {
             var key = Console.ReadKey();
@@ -194,7 +193,7 @@ class CarsGame
         for (int i = 0; i < objects.Count; i++)
         {
             Object oldCar = objects[i];
-            newObject.x = oldCar.x + 1;
+            newObject.x = oldCar.x + 10;
             newObject.y = oldCar.y;
             newObject.c = oldCar.c;
             HittingCars();
