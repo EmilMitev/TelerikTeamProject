@@ -127,6 +127,7 @@ $$ |  $$ |$$ |  $$ |$$ |\$  /$$ |$$ |            $$ |  $$ |  \$$$  /  $$ |      
             {
                 speed = 90;
             }
+            ++speed;
             DrawInfo(GameWidth, GameHeight, livesCount, acceleration, speed);
             Thread.Sleep(100 - speed);
             Console.Clear();
