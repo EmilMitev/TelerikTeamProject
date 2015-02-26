@@ -1,16 +1,17 @@
 ﻿﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-//създаване на обект
+//create object
 struct Object
 {
-    //тези данни показват:
-    public int x; //къде по Х координатата
-    public int y; //Къде по У координатата
-    public char[,] c; // какво тук е символ нашето ще е масив от символи
-    public ConsoleColor color; //какъв цвят
+
+    public int x;
+    public int y;
+    public char[,] c;
+    public ConsoleColor color;
 }
 
 class CarsGame
@@ -20,6 +21,8 @@ class CarsGame
     const int InfoPanelHeight = 10;
     const int GameWidth = RaceWidth;
     const int GameHeight = RaceHeight + InfoPanelHeight;
+
+    #region user car
     static char[,] userCarArr = new char[,]
     {
             { ' ',' ',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ',' ' },
@@ -32,6 +35,9 @@ class CarsGame
             { ' ',' ',' ',' ',' ',' ',' ','[','_','_','_',']',' ',' ',' ',' ','[','_','_','_',']',' ',' ',' ',' ',' ',' ' }
 
     };
+    #endregion
+
+    #region enemy car
     static char[,] enemyCar = new char[,]
     {
             { ' ',' ',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ',' ' },
@@ -43,6 +49,8 @@ class CarsGame
             { ' ',' ','\\','_','|',' ',' ',' ','_','$','_',' ',' ',' ',' ',' ',' ','_','S','_',' ',' ',' ','|','/',' ',' ' },
             { ' ',' ',' ',' ',' ',' ',' ','[','_','_','_',']',' ',' ',' ',' ','[','_','_','_',']',' ',' ',' ',' ',' ',' ' }
     };
+    #endregion
+
     static List<Object> objects = new List<Object>();
     static Object userCar = new Object();
     static Object newObject = new Object();
@@ -52,6 +60,8 @@ class CarsGame
     static int speed = 0;
     static int acceleration = 2;
     static int livesCount = 3;
+    static int score = 0;
+    static int bestScore = 0;
 
 
     static void Main()
@@ -65,6 +75,16 @@ class CarsGame
 
         newObject.x = 40;
         userCar.c = userCarArr;
+        try
+        {
+            StreamReader reader = new StreamReader("bestScore.txt");
+            bestScore = int.Parse(reader.ReadLine());
+            reader.Close();
+        }
+        catch (FileNotFoundException ex)
+        {
+            Console.Error.WriteLine(ex.Message);
+        }
 
         while (true)
         {
@@ -76,46 +96,10 @@ class CarsGame
             }
 
             #region end of the program
-            if (!DrawInfo(GameWidth, GameHeight, livesCount, acceleration, speed))
+            if (EndGame())
             {
-                Console.Clear();
-                Console.WriteLine(@"    .... NO! ...                  ... MNO! ...
-   ..... MNO!! ...................... MNNOO! ...
- ..... MMNO! ......................... MNNOO!! .
-..... MNOONNOO!   MMMMMMMMMMPPPOII!   MNNO!!!! .
- ... !O! NNO! MMMMMMMMMMMMMPPPOOOII!! NO! ....
-    ...... ! MMMMMMMMMMMMMPPPPOOOOIII! ! ...
-   ........ MMMMMMMMMMMMPPPPPOOOOOOII!! .....
-   ........ MMMMMOOOOOOPPPPPPPPOOOOMII! ...
-    ....... MMMMM..    OPPMMP    .,OMI! ....
-     ...... MMMM::   o.,OPMP,.o   ::I!! ...
-         .... NNM:::.,,OOPM!P,.::::!! ....
-          .. MMNNNNNOOOOPMO!!IIPPO!!O! .....
-         ... MMMMMNNNNOO:!!:!!IPPPPOO! ....
-           .. MMMMMNNOOMMNNIIIPPPOO!! ......
-          ...... MMMONNMMNNNIIIOO!..........
-       ....... MN MOMMMNNNIIIIIO! OO ..........
-    ......... MNO! IiiiiiiiiiiiI OOOO ...........
-  ...... NNN.MNO! . O!!!!!!!!!O . OONO NO! ........
-   .... MNNNNNO! ...OOOOOOOOOOO .  MMNNON!........
-   ...... MNNNNO! .. PPPPPPPPP .. MMNON!........
-      ...... OO! ................. ON! .......
-         ................................
-");
-                Console.WriteLine(@" $$$$$$\   $$$$$$\  $$\      $$\ $$$$$$$$\        $$$$$$\  $$\    $$\ $$$$$$$$\ $$$$$$$\  
-$$  __$$\ $$  __$$\ $$$\    $$$ |$$  _____|      $$  __$$\ $$ |   $$ |$$  _____|$$  __$$\ 
-$$ /  \__|$$ /  $$ |$$$$\  $$$$ |$$ |            $$ /  $$ |$$ |   $$ |$$ |      $$ |  $$ |
-$$ |$$$$\ $$$$$$$$ |$$\$$\$$ $$ |$$$$$\          $$ |  $$ |\$$\  $$  |$$$$$\    $$$$$$$  |
-$$ |\_$$ |$$  __$$ |$$ \$$$  $$ |$$  __|         $$ |  $$ | \$$\$$  / $$  __|   $$  __$$< 
-$$ |  $$ |$$ |  $$ |$$ |\$  /$$ |$$ |            $$ |  $$ |  \$$$  /  $$ |      $$ |  $$ |
-\$$$$$$  |$$ |  $$ |$$ | \_/ $$ |$$$$$$$$\        $$$$$$  |   \$  /   $$$$$$$$\ $$ |  $$ |
- \______/ \__|  \__|\__|     \__|\________|       \______/     \_/    \________|\__|  \__|
-                                                                                          
-                                                                                          
-                                                                                          ");
-                                                                                          
-                       
-                return;
+                PrintStringOnPosition();
+                break;
             }
             #endregion
 
@@ -128,15 +112,28 @@ $$ |  $$ |$$ |  $$ |$$ |\$  /$$ |$$ |            $$ |  $$ |  \$$$  /  $$ |      
                 speed = 90;
             }
             ++speed;
+            score += 10;
             DrawInfo(GameWidth, GameHeight, livesCount, acceleration, speed);
             Thread.Sleep(100 - speed);
             Console.Clear();
-            Console.SetCursorPosition(GameWidth - 2, GameHeight - 2);
-            Console.WriteLine(speed);
+        }
+
+        if (score > bestScore)
+        {
+            try
+            {
+                StreamWriter streamWriter = new StreamWriter("bestScore.txt", false);
+                streamWriter.Write(score);
+                streamWriter.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+            }
         }
     }
 
-    //Този метод го ползваме за принтиране на количките и текста на зададена позиция
+    //Print cars and text at position on console
     static void PrintOnPosition(char[,] figure, int row, int col, ConsoleColor color)
     {
         Console.ForegroundColor = color;
@@ -149,7 +146,6 @@ $$ |  $$ |$$ |  $$ |$$ |\$  /$$ |$$ |            $$ |  $$ |  \$$$  /  $$ |      
         }
     }
 
-    //Метод, който принтира
     static void Print(int row, int col, object data)
     {
 
@@ -158,13 +154,57 @@ $$ |  $$ |$$ |  $$ |$$ |\$  /$$ |$$ |            $$ |  $$ |  \$$$  /  $$ |      
         Console.Write(data);
     }
 
-    //след като свършат животите ползваме този метод.
-    static void PrintStringOnPosition(int x, int y, string str, ConsoleColor color = ConsoleColor.Gray)
+    //After live is over write game over
+    static void PrintStringOnPosition(ConsoleColor color = ConsoleColor.Gray)
     {
+        Console.Clear();
+        Console.WriteLine(@"                     .... NO! ...                  ... MNO! ...
+                       ..... MNO!! ...................... MNNOO! ...
+                     ..... MMNO! ......................... MNNOO!! .
+                    ..... MNOONNOO!   MMMMMMMMMMPPPOII!   MNNO!!!! .
+                     ... !O! NNO! MMMMMMMMMMMMMPPPOOOII!! NO! ....
+                        ...... ! MMMMMMMMMMMMMPPPPOOOOIII! ! ...
+                       ........ MMMMMMMMMMMMPPPPPOOOOOOII!! .....
+                       ........ MMMMMOOOOOOPPPPPPPPOOOOMII! ...
+                        ....... MMMMM..    OPPMMP    .,OMI! ....
+                         ...... MMMM::   o.,OPMP,.o   ::I!! ...
+                             .... NNM:::.,,OOPM!P,.::::!! ....
+                              .. MMNNNNNOOOOPMO!!IIPPO!!O! .....
+                             ... MMMMMNNNNOO:!!:!!IPPPPOO! ....
+                               .. MMMMMNNOOMMNNIIIPPPOO!! ......
+                              ...... MMMONNMMNNNIIIOO!..........
+                           ....... MN MOMMMNNNIIIIIO! OO ..........
+                        ......... MNO! IiiiiiiiiiiiI OOOO ...........
+                      ...... NNN.MNO! . O!!!!!!!!!O . OONO NO! ........
+                       .... MNNNNNO! ...OOOOOOOOOOO .  MMNNON!........
+                       ...... MNNNNO! .. PPPPPPPPP .. MMNON!........
+                          ...... OO! ................. ON! .......
+                             ................................
+");
+        Console.WriteLine(@"    $$$$$$\   $$$$$$\  $$\      $$\ $$$$$$$$\        $$$$$$\  $$\    $$\ $$$$$$$$\ $$$$$$$\  
+    $$  __$$\ $$  __$$\ $$$\    $$$ |$$  _____|      $$  __$$\ $$ |   $$ |$$  _____|$$  __$$\ 
+    $$ /  \__|$$ /  $$ |$$$$\  $$$$ |$$ |            $$ /  $$ |$$ |   $$ |$$ |      $$ |  $$ |
+    $$ |$$$$\ $$$$$$$$ |$$\$$\$$ $$ |$$$$$\          $$ |  $$ |\$$\  $$  |$$$$$\    $$$$$$$  |
+    $$ |\_$$ |$$  __$$ |$$ \$$$  $$ |$$  __|         $$ |  $$ | \$$\$$  / $$  __|   $$  __$$< 
+    $$ |  $$ |$$ |  $$ |$$ |\$  /$$ |$$ |            $$ |  $$ |  \$$$  /  $$ |      $$ |  $$ |
+    \$$$$$$  |$$ |  $$ |$$ | \_/ $$ |$$$$$$$$\        $$$$$$  |   \$  /   $$$$$$$$\ $$ |  $$ |
+     \______/ \__|  \__|\__|     \__|\________|       \______/     \_/    \________|\__|  \__|
+
+                                                                                          ");
+        if (score > bestScore)
+        {
+            Console.WriteLine("Your score is: {0}", score);
+            Console.WriteLine("Best score is: {0}", score);
+        }
+        else
+        {
+            Console.WriteLine("Your score is: {0}", score);
+            Console.WriteLine("Best score is: {0}", bestScore);
+        }
+
 
     }
 
-    // това е колата на user-a
     static void MoveUserCar()
     {
         userCar.x = 120;
@@ -184,7 +224,6 @@ $$ |  $$ |$$ |  $$ |$$ |\$  /$$ |$$ |            $$ |  $$ |  \$$$  /  $$ |      
         PrintOnPosition(userCar.c, userCar.y, userCar.x, ConsoleColor.Cyan);
     }
 
-    // премества колата на user-a надолу
     static void MoveUserCarDown()
     {
         if (userCar.y + 8 - 1 < RaceHeight - 8)
@@ -193,7 +232,6 @@ $$ |  $$ |$$ |  $$ |$$ |\$  /$$ |$$ |            $$ |  $$ |  \$$$  /  $$ |      
         }
     }
 
-    // премества колата на user-a нагоре
     static void MoveUserCarUp()
     {
         if (userCar.y > 1)
@@ -202,11 +240,9 @@ $$ |  $$ |$$ |  $$ |$$ |\$  /$$ |$$ |            $$ |  $$ |  \$$$  /  $$ |      
         }
     }
 
-    //този е за създаване на нова кола която пада
     static void NewCar()
     {
         int chance = random.Next(0, 100);
-        int carsOnLine = 1;
         int[] laneY = { 0, 8, 16 };
         int randomIndexLaneY = random.Next(0, laneY.Length);
         if (chance < 90)
@@ -224,7 +260,6 @@ $$ |  $$ |$$ |  $$ |$$ |\$  /$$ |$$ |            $$ |  $$ |  \$$$  /  $$ |      
         OldCar();
     }
 
-    //проверява дали количките са се ударили
     static bool HittingCars()
     {
         if ((newObject.y == userCar.y) && (newObject.x + 25 >= userCar.x))
@@ -251,15 +286,12 @@ $$ |  $$ |$$ |  $$ |$$ |\$  /$$ |$$ |            $$ |  $$ |  \$$$  /  $$ |      
             {
                 newList.Add(newObject);
             }
-
         }
         objects = newList;
     }
 
-    //този е за принтиране на инфото за животите, ускорението и т.н.
-    static bool DrawInfo(int gameWidth, int gameHeight, double LiveCounter, double Acceleration, double Speed)
+    static void DrawInfo(int gameWidth, int gameHeight, double LiveCounter, double Acceleration, double Speed)
     {
-        //liveCounter - брой на животи, != 0;
         int x = 0, y = 0;
         string str = string.Empty;
         ConsoleColor color = ConsoleColor.Gray;
@@ -269,20 +301,31 @@ $$ |  $$ |$$ |  $$ |$$ |\$  /$$ |$$ |            $$ |  $$ |  \$$$  /  $$ |      
 
         Console.ForegroundColor = color;
 
-        if (LiveCounter > 0)
+        if (!EndGame())
         {
             Console.SetCursorPosition(x, y);
             Console.Write("Lives remaining: " + LiveCounter);
-            Console.WriteLine();
+            Console.SetCursorPosition(x, y + 1);
+            Console.Write("Score: " + score);
+            Console.SetCursorPosition(x, y + 2);
+            Console.Write("Best score: " + bestScore);
+            Console.SetCursorPosition(0, y);
             Console.Write("Current Speed: " + Speed);
-            Console.WriteLine();
+            Console.SetCursorPosition(0, y + 1);
             Console.Write("Current Acceleration: " + Acceleration);
             Console.WriteLine();
+        }
+    }
+
+    static bool EndGame()
+    {
+        if (livesCount <= 0)
+        {
+            return true;
         }
         else
         {
             return false;
         }
-        return true;
     }
 }
