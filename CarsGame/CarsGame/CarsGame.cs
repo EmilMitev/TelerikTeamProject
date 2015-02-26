@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 //create object
 struct Object
 {
-
     public int x;
     public int y;
     public char[,] c;
@@ -63,10 +62,8 @@ class CarsGame
     static int score = 0;
     static int bestScore = 0;
 
-
     static void Main()
     {
-
         Console.Title = "Car Race F1";
         Console.WindowWidth = GameWidth;
         Console.BufferWidth = GameWidth;
@@ -75,6 +72,71 @@ class CarsGame
 
         newObject.x = 40;
         userCar.c = userCarArr;
+
+        ReadFromFile();
+        
+
+        while (true)
+        {
+            if (EndGame())
+            {
+                PrintStringOnPosition();
+                break;
+            }
+
+            MoveUserCar();
+
+            NewObject();
+
+            if (HittingCars())
+            {
+                --livesCount;
+            }
+
+            foreach (Object car in objects)
+            {
+                PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red);
+            }
+
+            if (speed >= 90)
+            {
+                speed = 90;
+            }
+            else
+            {
+                ++speed;
+            }
+
+            score += 10;
+
+            DrawInfo(GameWidth, GameHeight, livesCount, acceleration, speed);
+
+            Thread.Sleep(100 - speed);
+            Console.Clear();
+        }
+
+        if (score > bestScore)
+        {
+            WriteIntoFile();
+        }
+    }
+
+    static void WriteIntoFile()
+    {
+        try
+        {
+            StreamWriter streamWriter = new StreamWriter("bestScore.txt", false);
+            streamWriter.Write(score);
+            streamWriter.Close();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex.Message);
+        }
+    }
+
+    static void ReadFromFile()
+    {
         try
         {
             StreamReader reader = new StreamReader("bestScore.txt");
@@ -84,52 +146,6 @@ class CarsGame
         catch (FileNotFoundException ex)
         {
             Console.Error.WriteLine(ex.Message);
-        }
-
-        while (true)
-        {
-            MoveUserCar();
-            NewCar();
-            if (HittingCars())
-            {
-                --livesCount;
-            }
-
-            #region end of the program
-            if (EndGame())
-            {
-                PrintStringOnPosition();
-                break;
-            }
-            #endregion
-
-            foreach (Object car in objects)
-            {
-                PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red);
-            }
-            if (speed >= 90)
-            {
-                speed = 90;
-            }
-            ++speed;
-            score += 10;
-            DrawInfo(GameWidth, GameHeight, livesCount, acceleration, speed);
-            Thread.Sleep(100 - speed);
-            Console.Clear();
-        }
-
-        if (score > bestScore)
-        {
-            try
-            {
-                StreamWriter streamWriter = new StreamWriter("bestScore.txt", false);
-                streamWriter.Write(score);
-                streamWriter.Close();
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex.Message);
-            }
         }
     }
 
@@ -148,14 +164,13 @@ class CarsGame
 
     static void Print(int row, int col, object data)
     {
-
         Console.CursorVisible = false;
         Console.SetCursorPosition(col, row);
         Console.Write(data);
     }
 
     //After live is over write game over
-    static void PrintStringOnPosition(ConsoleColor color = ConsoleColor.Gray)
+    static void PrintStringOnPosition(ConsoleColor color = ConsoleColor.Red)
     {
         Console.Clear();
         Console.WriteLine(@"                     .... NO! ...                  ... MNO! ...
@@ -240,7 +255,7 @@ class CarsGame
         }
     }
 
-    static void NewCar()
+    static void NewObject()
     {
         int chance = random.Next(0, 100);
         int[] laneY = { 0, 8, 16 };
