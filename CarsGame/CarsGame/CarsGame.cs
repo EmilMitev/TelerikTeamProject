@@ -91,8 +91,9 @@ class CarsGame
             if (HittingCars())
             {
                 --livesCount;
+                Console.Beep(730, 300);
             }
-            if (score % 1500 == 0 && score != 0)
+            if (score % 2000 == 0 && score != 0)
             {
                 livesCount++;
             }
