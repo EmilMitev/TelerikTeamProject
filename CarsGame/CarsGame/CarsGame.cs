@@ -92,7 +92,7 @@ class CarsGame
             {
                 --livesCount;
             }
-            if (score % 1500 == 0)
+            if (score % 1500 == 0 && score != 0)
             {
                 livesCount++;
             }
