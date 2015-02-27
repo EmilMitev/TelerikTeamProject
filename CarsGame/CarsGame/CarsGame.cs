@@ -92,7 +92,10 @@ class CarsGame
             {
                 --livesCount;
             }
-
+            if (score % 1500 == 0)
+            {
+                livesCount++;
+            }
             foreach (Object car in objects)
             {
                 PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red);
