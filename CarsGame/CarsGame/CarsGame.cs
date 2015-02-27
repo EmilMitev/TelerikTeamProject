@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Media;
 
 //create object
 struct Object
@@ -81,6 +82,7 @@ class CarsGame
             if (EndGame())
             {
                 PrintStringOnPosition();
+                EndGameSound();
                 break;
             }
 
@@ -347,4 +349,12 @@ class CarsGame
             return false;
         }
     }
+    static void EndGameSound()
+    {
+        using (SoundPlayer player = new SoundPlayer(@"../../Sound/GameOver.wav"))
+        {  
+            player.PlaySync();
+        }
+    }
+    
 }
