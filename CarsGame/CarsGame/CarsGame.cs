@@ -49,6 +49,46 @@ class CarsGame
 
     };
     #endregion
+    
+    static bool HittingBonus()
+    {
+        if ((newObject.y == userCar.y) && (newObject.x + 25 >= userCar.x))
+        {   
+	    objects.Clear();
+            return true;
+        }
+        return false;
+    }
+
+while (true)
+        {
+            MoveUserCar();
+            NewCar();
+            if (HittingBonus())
+            {
+                ++livesCount;
+            }
+	}
+static void Bonus()
+    {
+        int chance = random.Next(0, 100);
+        int carsOnLine = 1;
+        int[] laneY = { 0, 8, 16 };
+        int randomIndexLaneY = random.Next(0, laneY.Length);
+        if (chance < 5)
+        {
+            Object newCar = new Object();
+            newCar.color = ConsoleColor.Yellow;
+            newCar.x = 0;
+            newCar.y = laneY[randomIndexLaneY];
+            newCar.c = bonus;
+            if ((newObject.x - newCar.x) >= 40)
+            {
+                objects.Add(newCar);
+            }
+        }
+        OldCar();
+    }
 
     static List<Object> objects = new List<Object>();
     static Object userCar = new Object();
