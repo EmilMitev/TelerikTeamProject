@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Media;
 
 //create object
 struct Object
@@ -10,49 +11,54 @@ struct Object
     public int x;
     public int y;
     public char[,] c;
-    public ConsoleColor color;
 }
 
 class CarsGame
 {
-    const int RaceWidth = 150;
-    const int RaceHeight = 28;
+    const int RaceWidth = 100;
+    const int RaceHeight = 20;
     const int InfoPanelHeight = 10;
     const int GameWidth = RaceWidth;
     const int GameHeight = RaceHeight + InfoPanelHeight;
 
+    #region bonus
+    static char[,] bonus = new char[,]
+        { 
+            {'─','─','▐','█',' '},
+            {'─','─','█','─','▄'},
+            {'─','▐','█','▀',' '},
+            {'─','▌','─','▌',' '},
+            {'▐','▄','─','▐','▄'}
+        };
+    #endregion
+
     #region user car
     static char[,] userCarArr = new char[,]
     {
-            { ' ',' ',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ',' ' },
-            { ' ',' ',' ',' ',' ',' ',' ','[','_',' ','_',']',' ',' ',' ',' ','[','_',' ','_',']',' ',' ',' ','_',' ',' ' },
-            { ' ',' ','/','|',' ',' ','_','_','_','$','_','_','_','_','_','_','_','_','S','_',' ',' ',' ','|',' ','\\',' ' },
-            { ' ','/',' ','|','-','/',' ',' ',' ',' ',' ',' ',' ',' ','_','_','_','_',' ',' ','[','+','+','|',' ','|','+' },
-            { '<','<','<','<','<','-','-','-','<','|',' ',' ','|','>','_','_','_','_','O',')','<','o','o','o','>','|',' ' },
-            { ' ','\\',' ','|','-','\\','_','_','_',' ','_','_','_','_','_','_','_','_',' ','_','[','+','+','|',' ','|','+' },
-            { ' ',' ','\\','|',' ',' ',' ',' ','_','$','_',' ',' ',' ',' ',' ',' ','_','S','_',' ',' ',' ','|','_','/',' ' },
-            { ' ',' ',' ',' ',' ',' ',' ','[','_','_','_',']',' ',' ',' ',' ','[','_','_','_',']',' ',' ',' ',' ',' ',' ' }
-
+        {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ' },
+        {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','_',' ',' ',' ',' ','_',' '},
+        {' ',' ',' ','_','_','.','.','_','o','|',' ','\\','.','.','`','/',' '},
+        {'<','.','(','_',')','_','_','_','_','_','_','(','_',')',',','.','`'},
+        {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ' }
     };
     #endregion
 
     #region enemy car
     static char[,] enemyCar = new char[,]
     {
-            { ' ',' ',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ','_','_','_',' ',' ',' ',' ',' ',' ',' ' },
-            { ' ',' ',' ','_',' ',' ',' ','[','_',' ','_',']',' ',' ',' ',' ','[','_',' ','_',']',' ',' ',' ',' ',' ',' ' },
-            { ' ',' ','/',' ','|',' ',' ','_','_','$','_','_','_','_','_','_','_','_','S','_','_',' ',' ','|','\\',' ',' ' },
-            { ' ','+','|',' ','+','+',']',' ',' ','_','_','_','_',' ',' ',' ',' ',' ',' ',' ',' ','\\','-','|',' ','\\',' ' },
-            { ' ','|','<','o','o','o','>','(','0','_','_','_','_','<','|',' ','|','>','-','-','-','>','>','>','>','>',' ' },
-            { ' ','+','|',' ','+','+',']','_','_',' ','_','_','_','_','_','_','_','_',' ','_','_','/','-','|',' ','/',' ' },
-            { ' ',' ','\\','_','|',' ',' ',' ','_','$','_',' ',' ',' ',' ',' ',' ','_','S','_',' ',' ',' ','|','/',' ',' ' },
-            { ' ',' ',' ',' ',' ',' ',' ','[','_','_','_',']',' ',' ',' ',' ','[','_','_','_',']',' ',' ',' ',' ',' ',' ' }
+        {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ' },
+        {' ','_',' ',' ',' ',' ','_',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ' },
+        {' ','\\','`','.','.','/',' ','|','o','_','.','.','_','_',' ',' ',' ' },
+        {'`','.',',','(','_',')','_','_','_','_','_','_','(','_',')','.','>' },
+        {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ' }
+
     };
     #endregion
 
     static List<Object> objects = new List<Object>();
     static Object userCar = new Object();
-    static Object newObject = new Object();
+    static Object newCarObject = new Object();
+    static Object newBonusObject = new Object();
 
     static Random random = new Random();
 
@@ -70,54 +76,67 @@ class CarsGame
         Console.WindowHeight = GameHeight + 1;
         Console.BufferHeight = GameHeight + 1;
 
-        newObject.x = 40;
+        newCarObject.x = 40;
+        newBonusObject.x = 40;
         userCar.c = userCarArr;
 
         ReadFromFile();
-        
 
         while (true)
         {
-            if (EndGame())
-            {
-                PrintStringOnPosition();
-                break;
-            }
-
             MoveUserCar();
-
             NewObject();
-
-            if (HittingCars())
+            if (HittingObjects()==1)
+            {
+                score += 1000;
+            }
+            if (HittingObjects()==2)
             {
                 --livesCount;
+                speed -= 10;
+                score -= 500;
+                Console.Beep(730, 300);
             }
 
-            foreach (Object car in objects)
+            DrawInfo(GameWidth, GameHeight, livesCount, acceleration, speed);
+
+            score += 10;
+            if (score % 10000 == 0 && score != 0)
             {
-                PrintOnPosition(enemyCar, car.y, car.x, ConsoleColor.Red);
+                livesCount++;
             }
 
+            if (random.Next(0, 5) == 1)
+            {
+                ++speed;
+            }
             if (speed >= 90)
             {
                 speed = 90;
             }
-            else
-            {
-                ++speed;
-            }
-
-            score += 10;
-
-            DrawInfo(GameWidth, GameHeight, livesCount, acceleration, speed);
 
             Thread.Sleep(100 - speed);
             Console.Clear();
+
+            if (EndGame())
+            {
+                PrintStringAfrerGameIsOver();
+                EndGameSound();
+                break;
+            }
         }
 
         if (score > bestScore)
         {
             WriteIntoFile();
+        }
+    }
+    
+    static void EndGameSound()
+    {
+        using (SoundPlayer player = new SoundPlayer(@"../../Sound/GameOver.wav"))
+        {
+            player.PlaySync();
         }
     }
 
@@ -149,7 +168,6 @@ class CarsGame
         }
     }
 
-    //Print cars and text at position on console
     static void PrintOnPosition(char[,] figure, int row, int col, ConsoleColor color)
     {
         Console.ForegroundColor = color;
@@ -157,64 +175,81 @@ class CarsGame
         {
             for (int y = 0; y < figure.GetLength(1); y++)
             {
-                Print(row + x, col + y, figure[x, y]);
+                Console.CursorVisible = false;
+                Console.SetCursorPosition(col + y, row + x);
+                Console.Write(figure[x, y]);
             }
         }
     }
 
-    static void Print(int row, int col, object data)
-    {
-        Console.CursorVisible = false;
-        Console.SetCursorPosition(col, row);
-        Console.Write(data);
-    }
-
-    //After live is over write game over
-    static void PrintStringOnPosition(ConsoleColor color = ConsoleColor.Red)
+    static void PrintStringAfrerGameIsOver(ConsoleColor color = ConsoleColor.Red)
     {
         Console.Clear();
-        Console.WriteLine(@"                     .... NO! ...                  ... MNO! ...
-                       ..... MNO!! ...................... MNNOO! ...
-                     ..... MMNO! ......................... MNNOO!! .
-                    ..... MNOONNOO!   MMMMMMMMMMPPPOII!   MNNO!!!! .
-                     ... !O! NNO! MMMMMMMMMMMMMPPPOOOII!! NO! ....
-                        ...... ! MMMMMMMMMMMMMPPPPOOOOIII! ! ...
-                       ........ MMMMMMMMMMMMPPPPPOOOOOOII!! .....
-                       ........ MMMMMOOOOOOPPPPPPPPOOOOMII! ...
-                        ....... MMMMM..    OPPMMP    .,OMI! ....
-                         ...... MMMM::   o.,OPMP,.o   ::I!! ...
-                             .... NNM:::.,,OOPM!P,.::::!! ....
-                              .. MMNNNNNOOOOPMO!!IIPPO!!O! .....
-                             ... MMMMMNNNNOO:!!:!!IPPPPOO! ....
-                               .. MMMMMNNOOMMNNIIIPPPOO!! ......
-                              ...... MMMONNMMNNNIIIOO!..........
-                           ....... MN MOMMMNNNIIIIIO! OO ..........
-                        ......... MNO! IiiiiiiiiiiiI OOOO ...........
-                      ...... NNN.MNO! . O!!!!!!!!!O . OONO NO! ........
-                       .... MNNNNNO! ...OOOOOOOOOOO .  MMNNON!........
-                       ...... MNNNNO! .. PPPPPPPPP .. MMNON!........
-                          ...... OO! ................. ON! .......
-                             ................................
-");
-        Console.WriteLine(@"    $$$$$$\   $$$$$$\  $$\      $$\ $$$$$$$$\        $$$$$$\  $$\    $$\ $$$$$$$$\ $$$$$$$\  
+        if (score > bestScore)
+        {
+            Console.WriteLine(@"   
+                      :::!~!!!!!:.
+                  .xUHWH!! !!?M88WHX:.
+                .X*#M@$!!  !X!M$$$$$$WWx:.
+               :!!!!!!?H! :!$!$$$$$$$$$$8X:        
+              !!~  ~:~!! :~!$!#$$$$$$$$$$8X:                            _____________
+             :!~::!H!<   ~.U$X!?R$$$$$$$$MM!       Your score is: {0}  (_________ _.'``''-....
+             ~!~!!!!~~ .:XW$$$U!!?$$$$$$RMM!       Best score is: {1}      (___.-' _,
+               !:~~~ .:!M'T#$$$$WX??#MRRMMM!                                (_(_.-'  `   
+               ~?WuxiW*`   `'#$$$$8!!!!??!!!                                 (__)__,-''``'-----
+             :X- M$$$$       `'T#$T~!8$WUXU~
+            :%`  ~#$$$m:        ~!~ ?$$$$$$
+          :!`.-   ~T$$$$8xx.  .xWW- ~''##*'
+.....   -~~:<` !    ~?T#$$@@W@*?$$      /`
+W$@@M!!! .!~~ !!     .:XUW$W!~ `'~:    :
+#'~~`.:x%`!!  !H:   !WM$$$$Ti.: .!WUn+!`
+:::~:!!`:X~ .: ?H.!u '$$$B$$$!W:U!T$$M~
+.~~   :X@!.-~   ?@WTWo('*$$$W$TH$! `
+Wi.~!X$?!-~    : ?$$$B$Wu('**$RM!
+$R@i.~~ !     :   ~$$$$$B$$en:``
+?MXT@Wx.~    :     ~'##*$$$$M~", score, score);
+            Console.WriteLine(@"    
+    $$$$$$\   $$$$$$\  $$\      $$\ $$$$$$$$\        $$$$$$\  $$\    $$\ $$$$$$$$\ $$$$$$$\  
     $$  __$$\ $$  __$$\ $$$\    $$$ |$$  _____|      $$  __$$\ $$ |   $$ |$$  _____|$$  __$$\ 
     $$ /  \__|$$ /  $$ |$$$$\  $$$$ |$$ |            $$ /  $$ |$$ |   $$ |$$ |      $$ |  $$ |
     $$ |$$$$\ $$$$$$$$ |$$\$$\$$ $$ |$$$$$\          $$ |  $$ |\$$\  $$  |$$$$$\    $$$$$$$  |
     $$ |\_$$ |$$  __$$ |$$ \$$$  $$ |$$  __|         $$ |  $$ | \$$\$$  / $$  __|   $$  __$$< 
     $$ |  $$ |$$ |  $$ |$$ |\$  /$$ |$$ |            $$ |  $$ |  \$$$  /  $$ |      $$ |  $$ |
     \$$$$$$  |$$ |  $$ |$$ | \_/ $$ |$$$$$$$$\        $$$$$$  |   \$  /   $$$$$$$$\ $$ |  $$ |
-     \______/ \__|  \__|\__|     \__|\________|       \______/     \_/    \________|\__|  \__|
-
-                                                                                          ");
-        if (score > bestScore)
-        {
-            Console.WriteLine("Your score is: {0}", score);
-            Console.WriteLine("Best score is: {0}", score);
+     \______/ \__|  \__|\__|     \__|\________|       \______/     \_/    \________|\__|  \__| ");
         }
         else
         {
-            Console.WriteLine("Your score is: {0}", score);
-            Console.WriteLine("Best score is: {0}", bestScore);
+            Console.WriteLine(@"   
+                      :::!~!!!!!:.
+                  .xUHWH!! !!?M88WHX:.
+                .X*#M@$!!  !X!M$$$$$$WWx:.
+               :!!!!!!?H! :!$!$$$$$$$$$$8X:        
+              !!~  ~:~!! :~!$!#$$$$$$$$$$8X:       
+             :!~::!H!<   ~.U$X!?R$$$$$$$$MM!                            _____________
+             ~!~!!!!~~ .:XW$$$U!!?$$$$$$RMM!       Your score is: {0}  (_________ _.'``''-....
+               !:~~~ .:!M'T#$$$$WX??#MRRMMM!       Best score is: {1}      (___.-' _,
+               ~?WuxiW*`   `'#$$$$8!!!!??!!!                                (_(_.-'  `   
+             :X- M$$$$       `'T#$T~!8$WUXU~                                 (__)__,-''``'-----
+            :%`  ~#$$$m:        ~!~ ?$$$$$$
+          :!`.-   ~T$$$$8xx.  .xWW- ~''##*'
+.....   -~~:<` !    ~?T#$$@@W@*?$$      /`
+W$@@M!!! .!~~ !!     .:XUW$W!~ `'~:    :
+#'~~`.:x%`!!  !H:   !WM$$$$Ti.: .!WUn+!`
+:::~:!!`:X~ .: ?H.!u '$$$B$$$!W:U!T$$M~
+.~~   :X@!.-~   ?@WTWo('*$$$W$TH$! `
+Wi.~!X$?!-~    : ?$$$B$Wu('**$RM!
+$R@i.~~ !     :   ~$$$$$B$$en:``
+?MXT@Wx.~    :     ~'##*$$$$M~", score, bestScore);
+            Console.WriteLine(@"    
+    $$$$$$\   $$$$$$\  $$\      $$\ $$$$$$$$\        $$$$$$\  $$\    $$\ $$$$$$$$\ $$$$$$$\  
+    $$  __$$\ $$  __$$\ $$$\    $$$ |$$  _____|      $$  __$$\ $$ |   $$ |$$  _____|$$  __$$\ 
+    $$ /  \__|$$ /  $$ |$$$$\  $$$$ |$$ |            $$ /  $$ |$$ |   $$ |$$ |      $$ |  $$ |
+    $$ |$$$$\ $$$$$$$$ |$$\$$\$$ $$ |$$$$$\          $$ |  $$ |\$$\  $$  |$$$$$\    $$$$$$$  |
+    $$ |\_$$ |$$  __$$ |$$ \$$$  $$ |$$  __|         $$ |  $$ | \$$\$$  / $$  __|   $$  __$$< 
+    $$ |  $$ |$$ |  $$ |$$ |\$  /$$ |$$ |            $$ |  $$ |  \$$$  /  $$ |      $$ |  $$ |
+    \$$$$$$  |$$ |  $$ |$$ | \_/ $$ |$$$$$$$$\        $$$$$$  |   \$  /   $$$$$$$$\ $$ |  $$ |
+     \______/ \__|  \__|\__|     \__|\________|       \______/     \_/    \________|\__|  \__| ");
         }
 
 
@@ -222,7 +257,7 @@ class CarsGame
 
     static void MoveUserCar()
     {
-        userCar.x = 120;
+        userCar.x = 80;
         if (Console.KeyAvailable)
         {
             var key = Console.ReadKey();
@@ -235,15 +270,14 @@ class CarsGame
                 MoveUserCarDown();
             }
         }
-
-        PrintOnPosition(userCar.c, userCar.y, userCar.x, ConsoleColor.Cyan);
+        PrintOnPosition(userCar.c, userCar.y, userCar.x, ConsoleColor.Magenta);
     }
 
     static void MoveUserCarDown()
     {
-        if (userCar.y + 8 - 1 < RaceHeight - 8)
+        if (userCar.y + userCarArr.GetLength(0) - 1 < 10)
         {
-            userCar.y = userCar.y + 8;
+            userCar.y = userCar.y + userCarArr.GetLength(0);
         }
     }
 
@@ -251,58 +285,118 @@ class CarsGame
     {
         if (userCar.y > 1)
         {
-            userCar.y = userCar.y - 8;
+            userCar.y = userCar.y - userCarArr.GetLength(0);
         }
     }
 
     static void NewObject()
     {
         int chance = random.Next(0, 100);
-        int[] laneY = { 0, 8, 16 };
+        int[] laneY = { 0, userCarArr.GetLength(0), userCarArr.GetLength(0) * 2 };
         int randomIndexLaneY = random.Next(0, laneY.Length);
-        if (chance < 90)
+        if (chance<10)
+        {
+            Object newBonus = new Object();
+            newBonus.x = 0;
+            newBonus.y = laneY[randomIndexLaneY];
+            newBonus.c = bonus;
+            if ((newCarObject.x - newBonus.x) >= 30)
+            {
+                objects.Add(newBonus);
+            }
+        }
+        if (chance >10)
         {
             Object newCar = new Object();
-            newCar.color = ConsoleColor.Yellow;
             newCar.x = 0;
             newCar.y = laneY[randomIndexLaneY];
             newCar.c = enemyCar;
-            if ((newObject.x - newCar.x) >= 40)
+            if ((newCarObject.x - newCar.x) >= 30)
             {
                 objects.Add(newCar);
             }
         }
-        OldCar();
+        MovingEnemyCars();
     }
 
-    static bool HittingCars()
-    {
-        if ((newObject.y == userCar.y) && (newObject.x + 25 >= userCar.x))
-        {
-            speed += acceleration;
-            objects.Clear();
-            return true;
-        }
-        return false;
-    }
-
-    static void OldCar()
+    static void MovingEnemyCars()
     {
         List<Object> newList = new List<Object>();
         for (int i = 0; i < objects.Count; i++)
         {
-            Object oldCar = objects[i];
-            newObject.x = oldCar.x + 10;
-            newObject.y = oldCar.y;
-            newObject.c = oldCar.c;
-            HittingCars();
-            newObject.color = oldCar.color;
-            if (newObject.x < GameWidth - 26)
+            Object moveEnemyCar = objects[i];
+            newCarObject.x = moveEnemyCar.x + 4;
+            newCarObject.y = moveEnemyCar.y;
+            newCarObject.c = moveEnemyCar.c;
+            HittingObjects();
+            
+            if (newCarObject.x < GameWidth - userCarArr.GetLength(1))
             {
-                newList.Add(newObject);
+                newList.Add(newCarObject);
             }
         }
+
         objects = newList;
+
+        foreach (Object car in objects)
+        {
+            if (car.c==bonus)
+            {
+                PrintOnPosition(car.c, car.y, car.x, ConsoleColor.Green);
+            }
+            else
+            {
+                PrintOnPosition(car.c, car.y, car.x, ConsoleColor.Red);
+            }
+        }
+    }
+
+    static int HittingObjects()
+    {
+        if ((newCarObject.c == bonus) && (newCarObject.y == userCar.y) && (newCarObject.x + userCarArr.GetLength(1) >= userCar.x))
+        {
+            objects.Clear();
+            Console.Clear();
+            Console.SetCursorPosition(40, newCarObject.y);
+            Console.WriteLine("      _          ");
+            Console.SetCursorPosition(40, newCarObject.y+1);
+            Console.WriteLine("     /(|         ");
+            Console.SetCursorPosition(40, newCarObject.y + 2);
+            Console.WriteLine("    (  :               ___   ______  ______  ______    ");
+            Console.SetCursorPosition(40, newCarObject.y + 3);
+            Console.WriteLine("   __\\  \\  _____      /   \\ (  __  )(  __  )(  __  ) ");
+            Console.SetCursorPosition(40, newCarObject.y + 4);
+            Console.WriteLine(" (____)  `|      _    \\/| | | (  ) || (  ) || (  ) | ");
+            Console.SetCursorPosition(40, newCarObject.y + 5);
+            Console.WriteLine("(____)|   |    _| |_    | | | (  ) || (  ) || (  ) |");
+            Console.SetCursorPosition(40, newCarObject.y + 6);
+            Console.WriteLine(" (____).__|   |_   _| __| |_| (__) || (__) || (__) |");
+            Console.SetCursorPosition(40, newCarObject.y + 7);
+            Console.WriteLine("  (___)__.|___  |_|   \\____/(______)(______)(______) ");
+            Thread.Sleep(1000);                        
+      
+            return 1;
+        }
+        else if ((newCarObject.c == enemyCar) && (newCarObject.y == userCar.y) && (newCarObject.x + userCarArr.GetLength(1) >= userCar.x))
+        {
+            objects.Clear();
+            Console.Clear();
+            Console.SetCursorPosition(80, newCarObject.y);
+            Console.WriteLine(" o   ,");
+            Console.SetCursorPosition(80, newCarObject.y + 1);
+            Console.WriteLine("|   / _    ");
+            Console.SetCursorPosition(80, newCarObject.y + 2);
+            Console.WriteLine("@%_C R A/S H !  ");
+            Console.SetCursorPosition(80, newCarObject.y + 3);
+            Console.WriteLine("#@o___ ¯@@   ");
+            Console.SetCursorPosition(80, newCarObject.y + 4);
+            Console.WriteLine(" @%  ¯¯¯");
+            Console.SetCursorPosition(80, newCarObject.y + 5);
+            Console.WriteLine("|  o");
+            Thread.Sleep(1000);
+            return 2;
+        }
+        return 3;
     }
 
     static void DrawInfo(int gameWidth, int gameHeight, double LiveCounter, double Acceleration, double Speed)
