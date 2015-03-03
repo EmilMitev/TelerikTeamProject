@@ -86,11 +86,11 @@ class CarsGame
         {
             MoveUserCar();
             NewObject();
-            if (HittingObjects()==1)
+            if (HittingObjects() == 1)
             {
                 score += 1000;
             }
-            if (HittingObjects()==2)
+            if (HittingObjects() == 2)
             {
                 --livesCount;
                 speed -= 10;
@@ -131,7 +131,7 @@ class CarsGame
             WriteIntoFile();
         }
     }
-    
+
     static void EndGameSound()
     {
         using (SoundPlayer player = new SoundPlayer(@"../../Sound/GameOver.wav"))
@@ -294,7 +294,7 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
         int chance = random.Next(0, 100);
         int[] laneY = { 0, userCarArr.GetLength(0), userCarArr.GetLength(0) * 2 };
         int randomIndexLaneY = random.Next(0, laneY.Length);
-        if (chance<10)
+        if (chance < 10)
         {
             Object newBonus = new Object();
             newBonus.x = 0;
@@ -305,7 +305,7 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
                 objects.Add(newBonus);
             }
         }
-        if (chance >10)
+        if (chance > 10)
         {
             Object newCar = new Object();
             newCar.x = 0;
@@ -329,10 +329,19 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
             newCarObject.y = moveEnemyCar.y;
             newCarObject.c = moveEnemyCar.c;
             HittingObjects();
-            
-            if (newCarObject.x < GameWidth - userCarArr.GetLength(1))
+            if (moveEnemyCar.c == enemyCar)
             {
-                newList.Add(newCarObject);
+                if (newCarObject.x < GameWidth - userCarArr.GetLength(1))
+                {
+                    newList.Add(newCarObject);
+                }
+            }
+            else
+            {
+                if (newCarObject.x < GameWidth - bonus.GetLength(1))
+                {
+                    newList.Add(newCarObject);
+                }
             }
         }
 
@@ -340,7 +349,7 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
 
         foreach (Object car in objects)
         {
-            if (car.c==bonus)
+            if (car.c == bonus)
             {
                 PrintOnPosition(car.c, car.y, car.x, ConsoleColor.Green);
             }
@@ -359,7 +368,7 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
             Console.Clear();
             Console.SetCursorPosition(40, newCarObject.y);
             Console.WriteLine("      _          ");
-            Console.SetCursorPosition(40, newCarObject.y+1);
+            Console.SetCursorPosition(40, newCarObject.y + 1);
             Console.WriteLine("     /(|         ");
             Console.SetCursorPosition(40, newCarObject.y + 2);
             Console.WriteLine("    (  :               ___   ______  ______  ______    ");
@@ -373,8 +382,8 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
             Console.WriteLine(" (____).__|   |_   _| __| |_| (__) || (__) || (__) |");
             Console.SetCursorPosition(40, newCarObject.y + 7);
             Console.WriteLine("  (___)__.|___  |_|   \\____/(______)(______)(______) ");
-            Thread.Sleep(1000);                        
-      
+            Thread.Sleep(500);
+
             return 1;
         }
         else if ((newCarObject.c == enemyCar) && (newCarObject.y == userCar.y) && (newCarObject.x + userCarArr.GetLength(1) >= userCar.x))
@@ -393,7 +402,7 @@ $R@i.~~ !     :   ~$$$$$B$$en:``
             Console.WriteLine(" @%  ¯¯¯");
             Console.SetCursorPosition(80, newCarObject.y + 5);
             Console.WriteLine("|  o");
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
             return 2;
         }
         return 3;
