@@ -136,7 +136,14 @@ class CarsGame
     {
         using (SoundPlayer player = new SoundPlayer(@"../../Sound/GameOver.wav"))
         {
-            player.PlaySync();
+            try
+            {
+                player.PlaySync();
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.Error.WriteLine("File not found!\n{0}", ex.Message);
+            }
         }
     }
 
